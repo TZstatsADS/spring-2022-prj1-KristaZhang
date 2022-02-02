@@ -1,0 +1,426 @@
+---
+title: "Code part 2 TF-IDF of first 5 authors"
+author: "Krista(Ruijing) Zhang"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+```{r}
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(stringr)
+```
+```{r}
+library(readr)
+library(dplyr)
+library(janeaustenr)
+library(tidytext)
+
+phi <- read_csv("philosophy_data.csv")
+head(phi)
+```
+```{r}
+many<- phi %>%
+  distinct(author)
+
+many
+```
+
+##Plato
+```{r}
+data <- phi%>% 
+  filter(author=="Plato")
+dim(data)
+#View(data)
+
+#1. Switch to lower case 2. Remove numbers 3. Remove punctuation marks and stopwords 4. Remove extra whitespaces
+data_corpus = Corpus(VectorSource(data$sentence_lowered))
+data_corpus = tm_map(data_corpus, removeNumbers)
+data_corpus = tm_map(data_corpus, removePunctuation)
+data_corpus = tm_map(data_corpus, removeWords, c("the", "and", stopwords("english")))
+data_corpus =  tm_map(data_corpus, stripWhitespace)
+
+
+
+inspect(data_corpus[1])
+data_dtm <- DocumentTermMatrix(data_corpus)
+
+
+
+
+#To reduce the dimension of the DTM, we can remove the less frequent terms such that the sparsity is less than 0.95
+data_dtm = removeSparseTerms(data_dtm, 0.99)
+
+data_dtm
+```
+
+
+```{r}
+findFreqTerms(data_dtm, 1000)
+freq = data.frame(sort(colSums(as.matrix(data_dtm)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=50, colors=brewer.pal(1, "Dark2"))
+```
+
+
+```{r}
+data_dtm_tfidf <- DocumentTermMatrix(data_corpus, control = list(weighting = weightTfIdf))
+data_dtm_tfidf = removeSparseTerms(data_dtm_tfidf, 0.95)
+data_dtm_tfidf
+```
+```{r}
+freq = data.frame(sort(colSums(as.matrix(data_dtm_tfidf)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=100, colors=brewer.pal(1, "Dark2"))
+```
+
+##Aristotle
+```{r}
+dataA <- phi%>% 
+  filter(author=="Aristotle")
+dim(dataA)
+#View(dataA)
+summary(dataA$tokenized_txt)
+
+
+#1. Switch to lower case 2. Remove numbers 3. Remove punctuation marks and stopwords 4. Remove extra whitespaces
+dataA_corpus = Corpus(VectorSource(dataA$sentence_lowered))
+dataA_corpus = tm_map(dataA_corpus, removeNumbers)
+dataA_corpus = tm_map(dataA_corpus, removePunctuation)
+dataA_corpus = tm_map(dataA_corpus, removeWords, c("the", "and", stopwords("english")))
+dataA_corpus =  tm_map(dataA_corpus, stripWhitespace)
+
+
+
+inspect(dataA_corpus[1])
+dataA_dtm <- DocumentTermMatrix(dataA_corpus)
+
+
+```
+
+```{r}
+
+#To reduce the dimension of the DTM, we can remove the less frequent terms such that the sparsity is less than 0.95
+dataA_dtm = removeSparseTerms(dataA_dtm, 0.99)
+
+dataA_dtm
+```
+
+
+```{r}
+findFreqTerms(dataA_dtm, 1000)
+freq = data.frame(sort(colSums(as.matrix(dataA_dtm)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=50, colors=brewer.pal(1, "Dark2"))
+```
+
+
+```{r}
+dataA_dtm_tfidf <- DocumentTermMatrix(dataA_corpus, control = list(weighting = weightTfIdf))
+dataA_dtm_tfidf = removeSparseTerms(dataA_dtm_tfidf, 0.95)
+dataA_dtm_tfidf
+```
+```{r}
+freq = data.frame(sort(colSums(as.matrix(dataA_dtm_tfidf)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=100, colors=brewer.pal(1, "Dark2"))
+```
+
+
+
+
+##Locke
+```{r}
+dataL <- phi%>% 
+  filter(author=="Locke")
+dim(dataL)
+#View(dataL)
+summary(dataL$tokenized_txt)
+
+
+dataL_corpus = Corpus(VectorSource(dataL$sentence_lowered))
+dataL_corpus = tm_map(dataL_corpus, removeNumbers)
+dataL_corpus = tm_map(dataL_corpus, removePunctuation)
+dataL_corpus = tm_map(dataL_corpus, removeWords, c("the", "and", stopwords("english")))
+dataL_corpus =  tm_map(dataL_corpus, stripWhitespace)
+
+
+
+inspect(dataL_corpus[1])
+dataL_dtm <- DocumentTermMatrix(dataL_corpus)
+
+dataL_dtm = removeSparseTerms(dataL_dtm, 0.99)
+
+dataL_dtm
+```
+
+
+```{r}
+findFreqTerms(dataL_dtm, 1000)
+freq = data.frame(sort(colSums(as.matrix(dataL_dtm)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=50, colors=brewer.pal(1, "Dark2"))
+```
+
+
+```{r}
+dataL_dtm_tfidf <- DocumentTermMatrix(dataL_corpus, control = list(weighting = weightTfIdf))
+dataL_dtm_tfidf = removeSparseTerms(dataL_dtm_tfidf, 0.95)
+dataL_dtm_tfidf
+```
+```{r}
+freq = data.frame(sort(colSums(as.matrix(dataL_dtm_tfidf)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=100, colors=brewer.pal(1, "Dark2"))
+```
+
+
+##Hume
+```{r}
+dataH <- phi%>% 
+  filter(author=="Hume")
+dim(dataH)
+#View(dataH)
+summary(dataH$tokenized_txt)
+
+
+dataH_corpus = Corpus(VectorSource(dataH$sentence_lowered))
+dataH_corpus = tm_map(dataH_corpus, removeNumbers)
+dataH_corpus = tm_map(dataH_corpus, removePunctuation)
+dataH_corpus = tm_map(dataH_corpus, removeWords, c("the", "and", stopwords("english")))
+dataH_corpus =  tm_map(dataH_corpus, stripWhitespace)
+
+
+
+inspect(dataH_corpus[1])
+dataH_dtm <- DocumentTermMatrix(dataH_corpus)
+
+dataH_dtm = removeSparseTerms(dataH_dtm, 0.99)
+
+dataH_dtm
+```
+
+
+```{r}
+findFreqTerms(dataH_dtm, 1000)
+freq = data.frame(sort(colSums(as.matrix(dataH_dtm)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=50, colors=brewer.pal(1, "Dark2"))
+```
+
+
+```{r}
+dataH_dtm_tfidf <- DocumentTermMatrix(dataH_corpus, control = list(weighting = weightTfIdf))
+dataH_dtm_tfidf = removeSparseTerms(dataH_dtm_tfidf, 0.95)
+dataH_dtm_tfidf
+```
+```{r}
+freq = data.frame(sort(colSums(as.matrix(dataH_dtm_tfidf)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=100, colors=brewer.pal(1, "Dark2"))
+```
+
+
+
+##Berkeley
+```{r}
+dataB <- phi%>% 
+  filter(author=="Berkeley")
+dim(dataB)
+#View(dataB)
+summary(dataB$tokenized_txt)
+
+
+dataB_corpus = Corpus(VectorSource(dataB$sentence_lowered))
+dataB_corpus = tm_map(dataB_corpus, removeNumbers)
+dataB_corpus = tm_map(dataB_corpus, removePunctuation)
+dataB_corpus = tm_map(dataB_corpus, removeWords, c("the", "and", stopwords("english")))
+dataB_corpus =  tm_map(dataB_corpus, stripWhitespace)
+
+
+
+inspect(dataB_corpus[1])
+dataB_dtm <- DocumentTermMatrix(dataB_corpus)
+
+dataB_dtm = removeSparseTerms(dataB_dtm, 0.99)
+
+dataB_dtm
+```
+
+
+```{r}
+findFreqTerms(dataB_dtm, 1000)
+freq = data.frame(sort(colSums(as.matrix(dataB_dtm)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=50, colors=brewer.pal(1, "Dark2"))
+```
+
+
+```{r}
+dataB_dtm_tfidf <- DocumentTermMatrix(dataB_corpus, control = list(weighting = weightTfIdf))
+dataB_dtm_tfidf = removeSparseTerms(dataB_dtm_tfidf, 0.95)
+dataB_dtm_tfidf
+```
+```{r}
+freq = data.frame(sort(colSums(as.matrix(dataB_dtm_tfidf)), decreasing=TRUE))
+wordcloud(rownames(freq), freq[,1], max.words=100, colors=brewer.pal(1, "Dark2"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
